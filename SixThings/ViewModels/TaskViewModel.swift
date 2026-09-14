@@ -9,12 +9,14 @@ import Combine
 
 @MainActor
 class TaskViewModel: ObservableObject {
-    @Published var task: [Task] = []
+    @Published var tasks: [Task] = []
     @Published var date: Date = Date()
     @Published var errorMessage: String? = ""
     
-    func completeTask() {
-        
+    func completeTask(task: Task) {
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            tasks[index].isCompleted.toggle()
+        }
     }
     
     func editTask() {

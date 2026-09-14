@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct SixThingsApp: App {
+    
+    @StateObject var taskViewModel = TaskViewModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
+        .environmentObject(taskViewModel)
     }
 }
