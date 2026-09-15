@@ -10,6 +10,7 @@ struct RadialMenuView: View {
     
     @Binding var isExpanded: Bool
     @State private var itemsVisible: [Bool] = [false, false, false]
+    @Binding var showTaskEdit: Bool
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -19,6 +20,7 @@ struct RadialMenuView: View {
                 // 新增任務
                 Button {
                     // action
+                    showTaskEdit = true
                     toggleMenu()
                 } label: {
                     Label("新增任務", systemImage: "plus.circle.fill")
@@ -66,6 +68,7 @@ struct RadialMenuView: View {
                 toggleMenu()
             } label: {
                 Image(systemName: isExpanded ? "xmark" : "plus")
+                    .font(Font.system(size: 30, weight: .bold))
                     .foregroundColor(.white)
                     .frame(width: 60, height: 60)
                     .background(Color.blue)
@@ -107,7 +110,7 @@ struct RadialMenuView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var isExpanded = false
-    return RadialMenuView(isExpanded: $isExpanded)
-}
+//#Preview {
+//    @Previewable @State var isExpanded = false
+//    return RadialMenuView(isExpanded: $isExpanded)
+//}

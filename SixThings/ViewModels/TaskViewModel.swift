@@ -27,6 +27,22 @@ class TaskViewModel: ObservableObject {
         
     }
     
+    func isTodayTaskSet() -> Bool {
+        let todayTasks = tasks.filter { Calendar.current.isDateInToday($0.date) }
+        return todayTasks.count == 6
+    }
+
+    func getUnfinishedTasks() -> [Task] {
+        return tasks.filter { Calendar.current.isDateInToday($0.date) && !$0.isCompleted }
+    }
+
+    func saveTasks(todayTasks: [Task], tomorrowTasks: [Task]) {
+        // 只加入有填寫內容的新任務
+        let newTodayTasks = todayTasks.filter { !$0.title.isEmpty }
+        let newTomorrowTasks = tomorrowTasks.filter { !$0.title.isEmpty }
+        tasks.append(contentsOf: newTodayTasks)
+        tasks.append(contentsOf: newTomorrowTasks)
+    }
     
     
     

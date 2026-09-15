@@ -10,10 +10,13 @@ struct MainView: View {
     
     @EnvironmentObject var viewModel: TaskViewModel
     @State var isExpanded = false
+    @State var showTaskEdit = false
     
     var body: some View {
         
+        
         ZStack {
+            
             VStack(spacing: 0) {
                 //廣告
                 Rectangle()
@@ -54,8 +57,11 @@ struct MainView: View {
                         isExpanded = false
                     }
             }
-            RadialMenuView(isExpanded: $isExpanded)
+            RadialMenuView(isExpanded: $isExpanded, showTaskEdit: $showTaskEdit)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+        }
+        .navigationDestination(isPresented: $showTaskEdit) {
+            TaskEditView()
         }
         
     }

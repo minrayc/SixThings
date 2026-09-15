@@ -3,11 +3,7 @@ import SwiftUI
 struct CircularProgressView: View {
     let progress: Int // 0-6
     
-    @State private var breathT: Double = 0
-    @State private var radarAngle: Double = 0
-    
     let baseColors: [Color] = [.red, .orange, .yellow, .green.opacity(0.7), .green, .green.opacity(1.2)]
-    let lightColors: [Color] = [Color.red.opacity(0.4), Color.orange.opacity(0.4), Color.yellow.opacity(0.4), Color.green.opacity(0.3), Color.green.opacity(0.4), Color.green.opacity(0.5)]
     
     var currentColor: Color {
         guard progress > 0 else { return Color.gray.opacity(0.3) }
@@ -23,7 +19,7 @@ struct CircularProgressView: View {
     }
     
     var body: some View {
-        TimelineView(.animation) { _ in
+        TimelineView(.animation) { timeline in
             Canvas { context, size in
                 let cx = size.width / 2
                 let cy = size.height / 2
@@ -31,6 +27,7 @@ struct CircularProgressView: View {
                 let lineWidth: CGFloat = 10
                 let startAngle = Angle.degrees(-90)
                 let progressAngle = Angle.degrees(360 * Double(progress) / 6)
+                let time = timeline.date.timeIntervalSinceReferenceDate
                 
                 // 底圓
                 var bgCircle = Path()
@@ -40,8 +37,8 @@ struct CircularProgressView: View {
                 guard progress > 0 else { return }
                 
                 // 呼吸底色
-                let breathVal = (sin(breathT) + 1) / 2
-                let arcColor = currentColor.opacity(0.3 + 1.0 * breathVal)
+                let breathVal = (sin(time * 2.0) + 1) / 2
+                let arcColor = currentColor.opacity(0.3 + 0.7 * breathVal)
                 
                 var arcPath = Path()
                 arcPath.addArc(center: CGPoint(x: cx, y: cy), radius: r, startAngle: startAngle, endAngle: startAngle + progressAngle, clockwise: false)
@@ -49,6 +46,7 @@ struct CircularProgressView: View {
                 
                 // 雷達拖尾
                 let targetAngle = Double.pi * 2 * Double(progress) / 6
+                let radarAngle = (time * radarSpeed * 60).truncatingRemainder(dividingBy: targetAngle)
                 let tailLen = min(1.4, targetAngle)
                 let steps = 60
                 
@@ -73,20 +71,9 @@ struct CircularProgressView: View {
                 }
             }
         }
-        .onAppear {
-            // 用 Timer 驅動狀態更新
-            Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in
-                breathT += 0.05
-                if progress > 0 {
-                    radarAngle += radarSpeed
-                    let targetAngle = Double.pi * 2 * Double(progress) / 6
-                    if radarAngle > targetAngle { radarAngle = 0 }
-                }
-            }
-        }
     }
 }
 
 #Preview {
-    CircularProgressView(progress: 1)
+    CircularProgressView(progress: 3)
 }
