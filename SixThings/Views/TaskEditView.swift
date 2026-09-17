@@ -73,7 +73,7 @@ struct TaskEditView: View {
             }
             // 右下角返回按鈕
             Button {
-                viewModel.saveTasks(todayTasks: todayTasks, tomorrowTasks: tomorrowTasks)
+                viewModel.saveTasks(newTodayTasks: todayTasks, newTomorrowTasks: tomorrowTasks)
                 dismiss()
             } label: {
                 HStack {

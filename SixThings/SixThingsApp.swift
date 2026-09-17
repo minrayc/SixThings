@@ -11,11 +11,17 @@ import SwiftUI
 struct SixThingsApp: App {
     
     @StateObject var taskViewModel = TaskViewModel()
+    @Environment(\.scenePhase) var scenePhase
     
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
         .environmentObject(taskViewModel)
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
+                taskViewModel.checkAndUpdateDate()
+            }
+        }
     }
 }

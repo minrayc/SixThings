@@ -25,7 +25,7 @@ struct MainView: View {
                     .border(Color.black)
                 HStack(spacing: 30) {
                     //CircularProgressView + 鼓勵提示詞
-                    CircularProgressView(progress: viewModel.tasks.filter { $0.isCompleted }.count)
+                    CircularProgressView(progress: viewModel.todayTasks.filter { $0.isCompleted }.count)
                         .border(Color.black)
                         .frame(maxWidth: 150, maxHeight: 150)
                     Text("Keep going!")
@@ -38,7 +38,7 @@ struct MainView: View {
                 
                 VStack {
                     //六個任務欄位
-                    ForEach($viewModel.tasks) { $task in
+                    ForEach($viewModel.todayTasks) { $task in
                         TaskRowView(task: $task)
                     }
                 }
@@ -67,12 +67,12 @@ struct MainView: View {
     }
 }
 
-#Preview {
-    let vm = TaskViewModel()
-    vm.tasks = [
-        Task(title: "測試任務一", priority: 1, isCompleted: true, date: Date()),
-        Task(title: "測試任務二", priority: 2, isCompleted: false, date: Date())
-    ]
-    return MainView()
-        .environmentObject(vm)
-}
+//#Preview {
+//    let vm = TaskViewModel()
+//    vm.tasks = [
+//        Task(title: "測試任務一", priority: 1, isCompleted: true, date: Date()),
+//        Task(title: "測試任務二", priority: 2, isCompleted: false, date: Date())
+//    ]
+//    return MainView()
+//        .environmentObject(vm)
+//}

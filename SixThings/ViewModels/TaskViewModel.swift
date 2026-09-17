@@ -9,13 +9,23 @@ import Combine
 
 @MainActor
 class TaskViewModel: ObservableObject {
-    @Published var tasks: [Task] = []
+    @Published var todayTasks: [Task] = []
+    @Published var tomorrowTasks: [Task] = []
     @Published var date: Date = Date()
     @Published var errorMessage: String? = ""
     
+    func checkAndUpdateDate() {
+        // 檢查 todayTasks 的日期是不是今天
+        // 如果不是，代表跨日了
+        if let firstTask = todayTasks.first, !Calendar.current.isDateInToday(firstTask.date) {
+            todayTasks = tomorrowTasks
+            tomorrowTasks = []
+        }
+    }
+    
     func completeTask(task: Task) {
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index].isCompleted.toggle()
+        if let index = todayTasks.firstIndex(where: { $0.id == task.id }) {
+            todayTasks[index].isCompleted.toggle()
         }
     }
     
@@ -28,20 +38,16 @@ class TaskViewModel: ObservableObject {
     }
     
     func isTodayTaskSet() -> Bool {
-        let todayTasks = tasks.filter { Calendar.current.isDateInToday($0.date) }
         return todayTasks.count == 6
     }
 
     func getUnfinishedTasks() -> [Task] {
-        return tasks.filter { Calendar.current.isDateInToday($0.date) && !$0.isCompleted }
+        return todayTasks.filter { !$0.isCompleted }
     }
 
-    func saveTasks(todayTasks: [Task], tomorrowTasks: [Task]) {
-        // 只加入有填寫內容的新任務
-        let newTodayTasks = todayTasks.filter { !$0.title.isEmpty }
-        let newTomorrowTasks = tomorrowTasks.filter { !$0.title.isEmpty }
-        tasks.append(contentsOf: newTodayTasks)
-        tasks.append(contentsOf: newTomorrowTasks)
+    func saveTasks(newTodayTasks: [Task], newTomorrowTasks: [Task]) {
+        todayTasks = newTodayTasks.filter { !$0.title.isEmpty }
+        tomorrowTasks = newTomorrowTasks.filter { !$0.title.isEmpty }
     }
     
     
