@@ -11,6 +11,7 @@ import Combine
 class TaskViewModel: ObservableObject {
     @Published var todayTasks: [Task] = []
     @Published var tomorrowTasks: [Task] = []
+    @Published var savedTomorrowTasks: [Task] = []
     @Published var date: Date = Date()
     @Published var errorMessage: String? = ""
     
@@ -20,12 +21,15 @@ class TaskViewModel: ObservableObject {
         if let firstTask = todayTasks.first, !Calendar.current.isDateInToday(firstTask.date) {
             todayTasks = tomorrowTasks
             tomorrowTasks = []
+            savedTomorrowTasks = []
         }
     }
     
     func completeTask(task: Task) {
         if let index = todayTasks.firstIndex(where: { $0.id == task.id }) {
-            todayTasks[index].isCompleted.toggle()
+            if !todayTasks[index].isCompleted {
+                todayTasks[index].isCompleted = true
+            }
         }
     }
     
@@ -48,6 +52,10 @@ class TaskViewModel: ObservableObject {
     func saveTasks(newTodayTasks: [Task], newTomorrowTasks: [Task]) {
         todayTasks = newTodayTasks.filter { !$0.title.isEmpty }
         tomorrowTasks = newTomorrowTasks.filter { !$0.title.isEmpty }
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        savedTomorrowTasks = newTomorrowTasks.filter {
+            !$0.title.isEmpty && !$0.isCompleted && Calendar.current.isDate($0.date, inSameDayAs: tomorrow)
+        }
     }
     
     
