@@ -84,7 +84,7 @@ struct TaskEditView: View {
                 let saved = viewModel.savedTomorrowTasks.filter { task in
                     !unfinished.contains { $0.id == task.id }
                 }
-                let combined = unfinished + saved
+                let combined = Array((unfinished + saved).prefix(6)) // 最多只取 6 個
                 let remaining = 6 - combined.count
                 let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
                 let emptyTasks = remaining > 0 ? (1...remaining).map {

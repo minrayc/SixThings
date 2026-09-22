@@ -28,7 +28,7 @@ struct MainView: View {
                     CircularProgressView(progress: viewModel.todayTasks.filter { $0.isCompleted }.count)
                         .border(Color.black)
                         .frame(maxWidth: 150, maxHeight: 150)
-                    Text("Keep going!")
+                    Text(viewModel.getEncouragement(progress: viewModel.todayTasks.filter { $0.isCompleted }.count))
                         .border(Color.black)
                     Spacer()
                 }

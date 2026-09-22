@@ -58,6 +58,11 @@ class TaskViewModel: ObservableObject {
         }
     }
     
+    func getEncouragement(progress: Int) -> String {
+        guard progress > 0 && progress <= 6 else { return "" }
+        let random = Int.random(in: 1...3)
+        return NSLocalizedString("encouragement_\(progress)_\(random)", comment: "")
+    }
     
     
     
