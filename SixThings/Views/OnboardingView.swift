@@ -14,10 +14,8 @@ struct OnboardingView: View {
         "因為考試今天需要熬夜讀書",
         "明天要交作業了卻還沒寫",
         "過了一年還是沒有瘦下來",
-        "彷彿在原地踏步",
-        "每天都是工作、睡覺令人麻木",
         "明明努力了，卻看不見進步",
-        "想改變，卻不知從何開始"
+        "彷彿在原地踏步"
     ]
     
     @State var visibleLines: Int = 0
@@ -27,10 +25,15 @@ struct OnboardingView: View {
     
     var body: some View {
         ZStack {
-            Image("onboarding_spiral_bg")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
+            GeometryReader { geo in
+                Image("onboarding_spiral_bg")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .offset(x: 0, y: 0) // 調整這個數值
+                    .clipped()
+            }
+            .ignoresSafeArea()
             
             ZStack {
                 switch phase {
@@ -70,6 +73,7 @@ struct OnboardingView: View {
                 if showHint && !showWhiteFlash {
                     Text("〉點擊下一步")
                         .font(.title2)
+                        .bold()
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                         .padding()

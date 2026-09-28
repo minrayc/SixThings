@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 @main
 struct SixThingsApp: App {
     
     @StateObject var taskViewModel = TaskViewModel()
     @Environment(\.scenePhase) var scenePhase
+    
+    init() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            print("通知權限：\(granted)")
+        }
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -21,6 +28,7 @@ struct SixThingsApp: App {
         .onChange(of: scenePhase) {
             if scenePhase == .active {
                 taskViewModel.checkAndUpdateDate()
+                NotificationService.shared.scheduleNotifications(todayTasks: taskViewModel.todayTasks)
             }
         }
     }
