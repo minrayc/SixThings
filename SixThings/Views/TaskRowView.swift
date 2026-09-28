@@ -10,42 +10,71 @@ struct TaskRowView: View {
     
     @Binding var task: Task
     @EnvironmentObject var viewModel: TaskViewModel
+    @State private var showAlert = false
     
     var body: some View {
-        HStack {
-            // 左側 checkbox
-            Circle()
-                .fill(task.isCompleted ? Color.green.opacity(0.2) : Color.clear)
-                .frame(width: 24, height: 24)
-                .overlay(
-                    Circle().stroke(Color.gray, lineWidth: 1.5)
-                )
-                .overlay(
-                    task.isCompleted ? Image(systemName: "checkmark")
-                        .foregroundColor(.green)
-                        .font(.caption) : nil
-                )
+        
+        let currentPriority = viewModel.currentPriority
+        
+        HStack(alignment: .center, spacing: 14) {
+            // 優先順序數字
+            Text("\(task.priority)")
+                .font(.custom("JasonHandwriting4-Regular", size: task.priority == currentPriority ? 32 : 22))
+                .fontWeight(task.priority == currentPriority ? .black : .regular)
+                .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (task.priority == currentPriority ? .primary : .gray.opacity(0.5)))
+                .frame(minWidth: 28)
             
-            // 中間任務名稱
-            Text(task.title)
-                .foregroundColor(task.isCompleted ? .gray : .primary)
-                .strikethrough(task.isCompleted)
+            // 任務名稱 + 波浪刪除線
+            ZStack(alignment: .leading) {
+                Text(task.title)
+                    .font(.custom("JasonHandwriting4-Regular", size: task.priority == currentPriority ? 32 : 22))
+                    .fontWeight(task.priority == currentPriority ? .bold : .regular)
+                    .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (task.priority == currentPriority ? .primary : .gray.opacity(0.5)))
+                
+                if task.isCompleted {
+                    WavyStrikethrough()
+                }
+            }
             
             Spacer()
             
-            // 右側優先順序
-            Text("\(task.priority)")
-                    .foregroundColor(.gray)
-                    .font(.caption)
+            if task.isCompleted {
+                Text("✓")
+                    .foregroundColor(.green)
+            }
         }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 8)
+        .overlay(
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.gray.opacity(0.4)),
+                alignment: .bottom
+            )
         .onTapGesture {
-            // 點擊完成任務
-            viewModel.completeTask(task: task)
+            if !task.isCompleted {
+                showAlert = true
+            }
+        }
+        .alert("此任務已完成？", isPresented: $showAlert) {
+            Button("還沒", role: .cancel) { }
+            Button("已完成") {
+                viewModel.completeTask(task: task)
+            }
         }
     }
+        
 }
 
 #Preview {
-    TaskRowView(task: .constant(Task(title: "測試任務", priority: 1, isCompleted: false, date: Date())))
-        .environmentObject(TaskViewModel())
+    let vm = TaskViewModel()
+    vm.todayTasks = [
+        Task(title: "測試任務一", priority: 1, isCompleted: true, date: Date()),
+        Task(title: "測試任務二", priority: 2, isCompleted: false, date: Date())
+    ]
+    return VStack {
+        TaskRowView(task: .constant(vm.todayTasks[0]))
+        TaskRowView(task: .constant(vm.todayTasks[1]))
+    }
+    .environmentObject(vm)
 }

@@ -10,9 +10,22 @@
 		22AE00AE3037518E00135331 /* SixThings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SixThings.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		226E9C14306A66AB00EC3041 /* Exceptions for "SixThings" folder in "SixThings" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 22AE00AD3037518E00135331 /* SixThings */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		22AE00B03037518E00135331 /* SixThings */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				226E9C14306A66AB00EC3041 /* Exceptions for "SixThings" folder in "SixThings" target */,
+			);
 			path = SixThings;
 			sourceTree = "<group>";
 		};
@@ -256,7 +269,7 @@
 				DEVELOPMENT_TEAM = 3998V94H8L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = SixThings/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -290,7 +303,7 @@
 				DEVELOPMENT_TEAM = 3998V94H8L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = SixThings/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

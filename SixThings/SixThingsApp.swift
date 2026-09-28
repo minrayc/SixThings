@@ -18,6 +18,11 @@ struct SixThingsApp: App {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             print("通知權限：\(granted)")
         }
+        for family in UIFont.familyNames {
+            for font in UIFont.fontNames(forFamilyName: family) {
+                print(font)
+            }
+        }
     }
     
     var body: some Scene {
