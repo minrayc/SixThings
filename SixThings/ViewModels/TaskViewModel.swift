@@ -14,9 +14,42 @@ class TaskViewModel: ObservableObject {
     @Published var savedTomorrowTasks: [Task] = []
     @Published var date: Date = Date()
     @Published var errorMessage: String? = ""
+    
     var currentPriority: Int {
         todayTasks.filter { !$0.isCompleted }.min(by: { $0.priority < $1.priority })?.priority ?? 0
     }
+    
+    init() {
+        loadTasks()
+    }
+    
+    func loadTasks() {
+        if let data = UserDefaults.standard.data(forKey: "todayTasks"),
+           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
+            todayTasks = decoded
+        }
+        if let data = UserDefaults.standard.data(forKey: "tomorrowTasks"),
+           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
+            tomorrowTasks = decoded
+        }
+        if let data = UserDefaults.standard.data(forKey: "savedTomorrowTasks"),
+           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
+            savedTomorrowTasks = decoded
+        }
+    }
+
+    func persistTasks() {
+        if let encoded = try? JSONEncoder().encode(todayTasks) {
+            UserDefaults.standard.set(encoded, forKey: "todayTasks")
+        }
+        if let encoded = try? JSONEncoder().encode(tomorrowTasks) {
+            UserDefaults.standard.set(encoded, forKey: "tomorrowTasks")
+        }
+        if let encoded = try? JSONEncoder().encode(savedTomorrowTasks) {
+            UserDefaults.standard.set(encoded, forKey: "savedTomorrowTasks")
+        }
+    }
+    
     
     func checkAndUpdateDate() {
         // 檢查 todayTasks 的日期是不是今天
@@ -25,6 +58,7 @@ class TaskViewModel: ObservableObject {
             todayTasks = tomorrowTasks
             tomorrowTasks = []
             savedTomorrowTasks = []
+            persistTasks()
         }
     }
     
@@ -34,6 +68,7 @@ class TaskViewModel: ObservableObject {
                 todayTasks[index].isCompleted = true
             }
         }
+        persistTasks()
     }
     
     func editTask() {
@@ -59,6 +94,7 @@ class TaskViewModel: ObservableObject {
         savedTomorrowTasks = newTomorrowTasks.filter {
             !$0.title.isEmpty && !$0.isCompleted && Calendar.current.isDate($0.date, inSameDayAs: tomorrow)
         }
+        persistTasks()
     }
     
     func getEncouragement(progress: Int) -> String {

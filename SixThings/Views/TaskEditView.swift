@@ -69,7 +69,9 @@ struct TaskEditView: View {
                             .fontWeight(!isToday ? .bold : .regular)
                             .foregroundColor(!isToday ? .primary : .secondary)
                     }
-                    .onTapGesture { isToday = false }
+                    .onTapGesture {
+                        isToday = false
+                        showTomorrowOverlay = true }
                 }
                 .padding(.vertical, 8)
                 VStack {
@@ -130,7 +132,7 @@ struct TaskEditView: View {
                 .border(Color.black)
                 
             }
-            .environment(\.editMode, .constant(.active))
+            .environment(\.editMode, .constant(isToday && isTodayReadOnly ? .inactive : .active))
             .onAppear {
                 // 今日
                 if viewModel.isTodayTaskSet() {

@@ -51,8 +51,9 @@ struct TaskRowView: View {
                     .foregroundColor(.gray.opacity(0.4)),
                 alignment: .bottom
             )
+        .contentShape(Rectangle())
         .onTapGesture {
-            if !task.isCompleted {
+            if task.priority == currentPriority {
                 showAlert = true
             }
         }
