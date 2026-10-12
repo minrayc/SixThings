@@ -8,28 +8,28 @@ import SwiftUI
 
 struct TaskRowView: View {
     
-    @Binding var task: Task
     @EnvironmentObject var viewModel: TaskViewModel
     @State private var showAlert = false
+    let task: Task
+    let number: Int
+    let isCurrent: Bool
     
     var body: some View {
         
-        let currentPriority = viewModel.currentPriority
-        
         HStack(alignment: .center, spacing: 14) {
             // 優先順序數字
-            Text("\(task.priority)")
-                .font(.custom("JasonHandwriting4-Regular", size: task.priority == currentPriority ? 32 : 22))
-                .fontWeight(task.priority == currentPriority ? .black : .regular)
-                .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (task.priority == currentPriority ? .primary : .gray.opacity(0.5)))
+            Text("\(number)")
+                .font(isCurrent ? .title3 : .body)
+                .fontWeight(isCurrent ? .black : .regular)
+                .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (isCurrent ? .primary : .gray.opacity(0.5)))
                 .frame(minWidth: 28)
             
             // 任務名稱 + 波浪刪除線
             ZStack(alignment: .leading) {
                 Text(task.title)
-                    .font(.custom("JasonHandwriting4-Regular", size: task.priority == currentPriority ? 32 : 22))
-                    .fontWeight(task.priority == currentPriority ? .bold : .regular)
-                    .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (task.priority == currentPriority ? .primary : .gray.opacity(0.5)))
+                    .font(isCurrent ? .title3 : .body)
+                    .fontWeight(isCurrent ? .bold : .regular)
+                    .foregroundColor(task.isCompleted ? .green.opacity(0.5) : (isCurrent ? .primary : .gray.opacity(0.5)))
                 
                 if task.isCompleted {
                     WavyStrikethrough()
@@ -53,7 +53,7 @@ struct TaskRowView: View {
             )
         .contentShape(Rectangle())
         .onTapGesture {
-            if task.priority == currentPriority {
+            if isCurrent {
                 showAlert = true
             }
         }
@@ -68,14 +68,10 @@ struct TaskRowView: View {
 }
 
 #Preview {
-    let vm = TaskViewModel()
-    vm.todayTasks = [
-        Task(title: "測試任務一", priority: 1, isCompleted: true, date: Date()),
-        Task(title: "測試任務二", priority: 2, isCompleted: false, date: Date())
-    ]
-    return VStack {
-        TaskRowView(task: .constant(vm.todayTasks[0]))
-        TaskRowView(task: .constant(vm.todayTasks[1]))
+    VStack {
+        TaskRowView(task: Task(title: "已完成任務", isCompleted: true, date: Date()), number: 1, isCurrent: false)
+        TaskRowView(task: Task(title: "當前任務", isCompleted: false, date: Date()), number: 2, isCurrent: true)
+        TaskRowView(task: Task(title: "下一個任務", isCompleted: false, date: Date()), number: 3, isCurrent: false)
     }
-    .environmentObject(vm)
+    .environmentObject(TaskViewModel())
 }

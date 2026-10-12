@@ -28,12 +28,10 @@ struct MainView: View {
                     
                         .frame(height: 170)
                     Text(viewModel.getEncouragement(progress: viewModel.todayTasks.filter { $0.isCompleted }.count))
-                        .font(.custom("JasonHandwriting4-Regular", size: 20))
-                        .tracking(5)
+                        .font(.title3)
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
                         .padding(.horizontal, 8)
-                        .frame(maxWidth: .infinity)
                         .overlay(alignment: .top) {
                             HandwrittenLine()
                         }
@@ -46,14 +44,18 @@ struct MainView: View {
                 
                 VStack {
                     //六個任務欄位
-                    ForEach($viewModel.todayTasks) { $task in
-                        TaskRowView(task: $task)
+                    ForEach(Array(viewModel.todayTasks.enumerated()), id: \.element.id) { index, task in
+                        TaskRowView(
+                            task: task,
+                            number: index + 1,
+                            isCurrent: task.id == viewModel.currentTaskID
+                        )
                     }
                     // 補空白行
                     ForEach(viewModel.todayTasks.count..<6, id: \.self) { i in
                         HStack(spacing: 14) {
                             Text("\(i + 1)")
-                                .font(.custom("JasonHandwriting4-Regular", size: 20))
+                                .font(.title3)
                                 .foregroundColor(.secondary)
                                 .frame(minWidth: 28)
                             Spacer()
@@ -90,13 +92,10 @@ struct MainView: View {
 
 #Preview {
     let vm = TaskViewModel()
-    vm.todayTasks = [
-        Task(title: "完成報告第一章", priority: 1, isCompleted: true, date: Date()),
-        Task(title: "回覆客戶信件", priority: 2, isCompleted: false, date: Date()),
-        Task(title: "整理會議記錄", priority: 3, isCompleted: false, date: Date()),
-        //        Task(title: "回覆客戶信件", priority: 2, isCompleted: false, date: Date()),
-        //        Task(title: "回覆客戶信件", priority: 2, isCompleted: false, date: Date()),
-        //        Task(title: "回覆客戶信件", priority: 2, isCompleted: false, date: Date())
+    vm.tasks = [
+        Task(title: "完成報告第一章", isCompleted: true, date: Date()),
+        Task(title: "回覆客戶信件", isCompleted: false, date: Date()),
+        Task(title: "整理會議記錄", isCompleted: false, date: Date())
     ]
     return MainView()
         .environmentObject(vm)

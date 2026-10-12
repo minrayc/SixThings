@@ -16,6 +16,10 @@ class TaskViewModel: ObservableObject {
         tasks.filter { Calendar.current.isDateInToday($0.date) }
     }
     
+    var tomorrowTasks: [Task] {
+        tasks.filter { Calendar.current.isDateInTomorrow($0.date) }
+    }
+    
     var currentTaskID: UUID? {
         todayTasks.first(where: { !$0.isCompleted })?.id
     }
