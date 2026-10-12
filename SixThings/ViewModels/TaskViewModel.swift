@@ -9,75 +9,58 @@ import Combine
 
 @MainActor
 class TaskViewModel: ObservableObject {
-    @Published var todayTasks: [Task] = []
-    @Published var tomorrowTasks: [Task] = []
-    @Published var savedTomorrowTasks: [Task] = []
-    @Published var date: Date = Date()
+    @Published var tasks: [Task] = []
     @Published var errorMessage: String? = ""
     
-    var currentPriority: Int {
-        todayTasks.filter { !$0.isCompleted }.min(by: { $0.priority < $1.priority })?.priority ?? 0
+    var todayTasks: [Task] {
+        tasks.filter { Calendar.current.isDateInToday($0.date) }
     }
     
+    var currentTaskID: UUID? {
+        todayTasks.first(where: { !$0.isCompleted })?.id
+    }
     init() {
         loadTasks()
+        checkAndUpdateDate()
     }
     
     func loadTasks() {
-        if let data = UserDefaults.standard.data(forKey: "todayTasks"),
+        if let data = UserDefaults.standard.data(forKey: "tasks"),
            let decoded = try? JSONDecoder().decode([Task].self, from: data) {
-            todayTasks = decoded
-        }
-        if let data = UserDefaults.standard.data(forKey: "tomorrowTasks"),
-           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
-            tomorrowTasks = decoded
-        }
-        if let data = UserDefaults.standard.data(forKey: "savedTomorrowTasks"),
-           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
-            savedTomorrowTasks = decoded
+            tasks = decoded
         }
     }
 
     func persistTasks() {
-        if let encoded = try? JSONEncoder().encode(todayTasks) {
-            UserDefaults.standard.set(encoded, forKey: "todayTasks")
-        }
-        if let encoded = try? JSONEncoder().encode(tomorrowTasks) {
-            UserDefaults.standard.set(encoded, forKey: "tomorrowTasks")
-        }
-        if let encoded = try? JSONEncoder().encode(savedTomorrowTasks) {
-            UserDefaults.standard.set(encoded, forKey: "savedTomorrowTasks")
+        if let encoded = try? JSONEncoder().encode(tasks) {
+            UserDefaults.standard.set(encoded, forKey: "tasks")
         }
     }
     
     
     func checkAndUpdateDate() {
-        // 檢查 todayTasks 的日期是不是今天
-        // 如果不是，代表跨日了
-        if let firstTask = todayTasks.first, !Calendar.current.isDateInToday(firstTask.date) {
-            todayTasks = tomorrowTasks
-            tomorrowTasks = []
-            savedTomorrowTasks = []
-            persistTasks()
+        let today = Calendar.current.startOfDay(for: Date())
+        tasks.removeAll { $0.date < today && $0.isCompleted }
+        tasks = tasks.map { task in
+            if task.date < today && !task.isCompleted {
+                var updated = task      // 1. 複製一份（task 是 let，不能直接改）
+                updated.date = today    // 2. 改日期
+                return updated          // 3. 回傳修改後的版本
+            }
+            return task                 // 不符合條件的原封不動回傳
         }
+        persistTasks()
     }
     
     func completeTask(task: Task) {
-        if let index = todayTasks.firstIndex(where: { $0.id == task.id }) {
-            if !todayTasks[index].isCompleted {
-                todayTasks[index].isCompleted = true
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            if !tasks[index].isCompleted {
+                tasks[index].isCompleted = true
             }
         }
         persistTasks()
     }
     
-    func editTask() {
-        
-    }
-    
-    func progress() {
-        
-    }
     
     func isTodayTaskSet() -> Bool {
         return todayTasks.count == 6
@@ -87,13 +70,15 @@ class TaskViewModel: ObservableObject {
         return todayTasks.filter { !$0.isCompleted }
     }
 
-    func saveTasks(newTodayTasks: [Task], newTomorrowTasks: [Task]) {
-        todayTasks = newTodayTasks.filter { !$0.title.isEmpty }
-        tomorrowTasks = newTomorrowTasks.filter { !$0.title.isEmpty }
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        savedTomorrowTasks = newTomorrowTasks.filter {
-            !$0.title.isEmpty && !$0.isCompleted && Calendar.current.isDate($0.date, inSameDayAs: tomorrow)
-        }
+    func saveTodayTasks(newTasks: [Task]) {
+        tasks.removeAll { Calendar.current.isDateInToday($0.date) }
+        tasks.append(contentsOf: newTasks.filter { !$0.title.isEmpty })
+        persistTasks()
+    }
+    
+    func saveTomorrowTasks(newTasks: [Task]) {
+        tasks.removeAll { Calendar.current.isDateInTomorrow($0.date) }
+        tasks.append(contentsOf: newTasks.filter { !$0.title.isEmpty && Calendar.current.isDateInTomorrow($0.date) })
         persistTasks()
     }
     

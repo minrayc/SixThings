@@ -138,9 +138,13 @@ struct TaskEditView: View {
                 if viewModel.isTodayTaskSet() {
                     todayTasks = viewModel.todayTasks
                 } else {
-                    todayTasks = (1...6).map {
-                        Task(title: "", priority: $0, isCompleted: false, date: Date())
-                    }
+                    // 預填現有任務，剩下的用空白補足
+                    let existing = viewModel.todayTasks
+                    let remaining = 6 - existing.count
+                    let emptyTasks = remaining > 0 ? (1...remaining).map {
+                        Task(title: "", priority: existing.count + $0, isCompleted: false, date: Date())
+                    } : []
+                    todayTasks = existing + emptyTasks
                 }
                 
                 // 明日：未完成任務 + 已儲存的明日任務 + 空白補足
