@@ -10,8 +10,13 @@ struct MainView: View {
     
     @EnvironmentObject var viewModel: TaskViewModel
     @State var isExpanded = false
-    @State var showTaskEdit = false
+    @State var showTodayEdit = false
+    @State var showTomorrowEdit = false
+    @State var currentEncouragement = ""
     
+    var completedCount:Int {
+        viewModel.todayTasks.filter { $0.isCompleted }.count
+    }
     var body: some View {
         
         ZStack {
@@ -21,13 +26,13 @@ struct MainView: View {
                 Rectangle()
                     .fill(Color.gray.opacity(0.2))
                     .frame(height: 50)
-
+                
                 VStack {
                     //CircularProgressView + 鼓勵提示詞
-                    CircularProgressView(progress: viewModel.todayTasks.filter { $0.isCompleted }.count)
+                    CircularProgressView(progress: completedCount)
                     
                         .frame(height: 170)
-                    Text(viewModel.getEncouragement(progress: viewModel.todayTasks.filter { $0.isCompleted }.count))
+                    Text(currentEncouragement)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
@@ -37,6 +42,9 @@ struct MainView: View {
                         }
                         .overlay(alignment: .bottom) {
                             HandwrittenLine()
+                        }
+                        .onChange(of: completedCount) {
+                            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
                         }
                     
                 }
@@ -80,11 +88,34 @@ struct MainView: View {
                         isExpanded = false
                     }
             }
-            RadialMenuView(isExpanded: $isExpanded, showTaskEdit: $showTaskEdit)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            RadialMenuView(
+                isExpanded: $isExpanded,
+                showTodayEdit: $showTodayEdit,
+                showTomorrowEdit: $showTomorrowEdit,
+                isTodayTaskSet: viewModel.isTodayTaskSet()
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         }
-        .navigationDestination(isPresented: $showTaskEdit) {
-            TaskEditView()
+        .navigationDestination(isPresented: $showTodayEdit) {
+            TodayTaskEditView()
+        }
+        .navigationDestination(isPresented: $showTomorrowEdit) {
+            TomorrowTaskEditView()
+        }
+        // 點 + 號展開選單時檢查跨日（處理停在畫面上跨過 00:00 的情況）
+        .onChange(of: isExpanded) {
+            if isExpanded {
+                viewModel.checkAndUpdateDate()
+            }
+        }
+        // 從編輯頁返回主畫面時
+        .onAppear {
+            viewModel.checkAndUpdateDate()
+            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
+        }
+        // 午夜換日時系統自動通知
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            viewModel.checkAndUpdateDate()
         }
         
     }
