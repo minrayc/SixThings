@@ -13,6 +13,8 @@ struct MainView: View {
     @State var showTodayEdit = false
     @State var showTomorrowEdit = false
     @State var currentEncouragement = ""
+    @AppStorage("hasSeenTutorial") var hasSeenTutorial = false
+    @State var showTutorial = false
     
     var completedCount:Int {
         viewModel.todayTasks.filter { $0.isCompleted }.count
@@ -30,8 +32,8 @@ struct MainView: View {
                 VStack {
                     //CircularProgressView + 鼓勵提示詞
                     CircularProgressView(progress: completedCount)
-                    
                         .frame(height: 170)
+                        .tutorialTarget(.progress)
                     Text(currentEncouragement)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
@@ -49,7 +51,17 @@ struct MainView: View {
                     
                 }
                 .frame(height: 250)
-                
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        withAnimation { showTutorial = true }
+                    } label: {
+                        Image(systemName: "lightbulb")
+                            .font(.title3)
+                            .foregroundColor(.yellow)
+                            .frame(width: 40, height: 40)
+                            .overlay(Circle().stroke(Color.yellow, lineWidth: 1.5))
+                    }
+                }
                 VStack {
                     //六個任務欄位
                     ForEach(Array(viewModel.todayTasks.enumerated()), id: \.element.id) { index, task in
@@ -73,6 +85,7 @@ struct MainView: View {
                         .overlay(Rectangle().frame(height: 1).foregroundColor(.gray.opacity(0.4)), alignment: .bottom)
                     }
                 }
+                .tutorialTarget(.tasks)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .padding(.top, 15)
                 
@@ -102,6 +115,11 @@ struct MainView: View {
         .navigationDestination(isPresented: $showTomorrowEdit) {
             TomorrowTaskEditView()
         }
+        .overlayPreferenceValue(TutorialAnchorKey.self) { anchors in
+            if showTutorial {
+                TutorialOverlay(anchors: anchors, isPresented: $showTutorial)
+            }
+        }
         // 點 + 號展開選單時檢查跨日（處理停在畫面上跨過 00:00 的情況）
         .onChange(of: isExpanded) {
             if isExpanded {
@@ -112,6 +130,11 @@ struct MainView: View {
         .onAppear {
             viewModel.checkAndUpdateDate()
             currentEncouragement = viewModel.getEncouragement(progress: completedCount)
+            if !hasSeenTutorial {
+                viewModel.addTutorialTask()
+                showTutorial = true
+                hasSeenTutorial = true
+            }
         }
         // 午夜換日時系統自動通知
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in

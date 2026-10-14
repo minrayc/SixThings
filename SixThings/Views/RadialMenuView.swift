@@ -97,6 +97,7 @@ struct RadialMenuView: View {
                     .background(Color.blue)
                     .clipShape(Circle())
             }
+            .tutorialTarget(.menu)
         }
         .padding()
         .onChange(of: isExpanded) {
