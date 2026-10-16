@@ -34,7 +34,7 @@ struct MainView: View {
                     CircularProgressView(progress: completedCount)
                         .frame(height: 170)
                         .tutorialTarget(.progress)
-                    Text(currentEncouragement)
+                    Text(LocalizedStringKey(currentEncouragement))
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
@@ -46,7 +46,7 @@ struct MainView: View {
                             HandwrittenLine()
                         }
                         .onChange(of: completedCount) {
-                            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
+                            currentEncouragement = viewModel.getEncouragementKey(progress: completedCount)
                         }
                     
                 }
@@ -74,7 +74,7 @@ struct MainView: View {
                     // 補空白行
                     ForEach(viewModel.todayTasks.count..<6, id: \.self) { i in
                         HStack(spacing: 14) {
-                            Text("\(i + 1)")
+                            Text(verbatim: "\(i + 1)")
                                 .font(.title3)
                                 .foregroundColor(.secondary)
                                 .frame(minWidth: 28)
@@ -129,7 +129,7 @@ struct MainView: View {
         // 從編輯頁返回主畫面時
         .onAppear {
             viewModel.checkAndUpdateDate()
-            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
+            currentEncouragement = viewModel.getEncouragementKey(progress: completedCount)
             if !hasSeenTutorial {
                 viewModel.addTutorialTask()
                 showTutorial = true

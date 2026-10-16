@@ -10,11 +10,9 @@ struct OnboardingView: View {
     
     @State var showFirstLine = true
     @State var phase = 0
-    let lines = [
-        "因為考試今天需要熬夜讀書",
+    let lines: [LocalizedStringKey] = [
         "明天要交作業了卻還沒寫",
         "過了一年還是沒有瘦下來",
-        "明明努力了，卻看不見進步",
         "彷彿在原地踏步"
     ]
     
@@ -48,12 +46,13 @@ struct OnboardingView: View {
                     VStack(spacing: 12) {
                         ForEach(0..<visibleLines, id: \.self) { i in
                             Text(lines[i])
-                                .font(.body)
+                                .font(.title3)
                                 .foregroundColor(.black)
                                 .transition(.opacity)
                         }
                     }
                     .animation(.easeIn(duration: 0.5), value: visibleLines)
+                    .frame(width: 250)
                     
                 case 2:
                     VStack(spacing: 12) {

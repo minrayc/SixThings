@@ -15,7 +15,7 @@ struct TodayTaskEditView: View {
     @State private var showTips = false
     @FocusState private var isEditing: Bool   // 是否有輸入框正在輸入
 
-    private let tips = [
+    private let tips: [LocalizedStringKey] = [
         "任務可以是一個目標，可以是一個好習慣，例如：運動30分鐘、完成報告的摘要",
         "先後順序很重要，你必須訓練對於任務的輕重緩急認知，才能更好地管理時間"
     ]

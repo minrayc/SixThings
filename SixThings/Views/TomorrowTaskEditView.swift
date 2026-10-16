@@ -15,7 +15,7 @@ struct TomorrowTaskEditView: View {
     @State private var showTips = false
     @FocusState private var isEditing: Bool
     // 唯讀：今日 6 個都未完成，沒有空位
-    private let tips = [
+    private let tips: [LocalizedStringKey] = [
         "今日未完成任務會優先出現在上方，完成它們才會空出位置",
         "先後順序很重要，你必須訓練對於任務的輕重緩急認知，才能更好地管理時間"
     ]

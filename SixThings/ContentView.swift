@@ -9,16 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @AppStorage("appLanguage") var appLanguage = ""
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding = false
-    
+
     var body: some View {
-        if hasSeenOnboarding {
-            NavigationStack {
-                MainView()
+        Group {
+            if appLanguage.isEmpty {
+                LanguageSelectionView()
+            } else if !hasSeenOnboarding {
+                OnboardingView()
+            } else {
+                NavigationStack {
+                    MainView()
+                }
             }
-        } else {
-            OnboardingView()
         }
+        .environment(\.locale, Locale(identifier: appLanguage.isEmpty ? "en" : appLanguage))
     }
 }
 

@@ -7,15 +7,18 @@
 import SwiftUI
 
 struct TipsCard: View {
-    let tips: [String]
+    let tips: [LocalizedStringKey]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 用 ForEach 把每條 tips 顯示成「✸ 內容」
-            ForEach(tips, id: \.self) { tip in
-                Text("✸ \(tip)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+            ForEach(tips.indices, id: \.self) { i in
+                HStack(alignment: .top, spacing: 6) {
+                    Text(verbatim: "✸")
+                    Text(tips[i])
+                }
+                .font(.subheadline)
+                .foregroundColor(.secondary)
             }
         }
         .padding()
