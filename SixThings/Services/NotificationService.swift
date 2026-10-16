@@ -15,8 +15,8 @@ class NotificationService {
         
         // 早上 9 點 — 今日任務尚未設定
         let morningContent = UNMutableNotificationContent()
-        morningContent.title = "今天的六件事還沒設定！"
-        morningContent.body = "現在設定好，讓今天更有方向。"
+        morningContent.title = localized("今天的六件事還沒設定！")
+        morningContent.body = localized("現在設定好，讓今天更有方向。")
         morningContent.sound = .default
         
         var morningComponents = DateComponents()
@@ -30,8 +30,8 @@ class NotificationService {
         
         // 下午 1 點 — 完成度未達 60%
         let afternoonContent = UNMutableNotificationContent()
-        afternoonContent.title = "午後提醒"
-        afternoonContent.body = "今天的任務完成了幾個？繼續加油！"
+        afternoonContent.title = localized("午後提醒")
+        afternoonContent.body = localized("今天的任務完成了幾個？繼續加油！")
         afternoonContent.sound = .default
         
         var afternoonComponents = DateComponents()
@@ -44,8 +44,8 @@ class NotificationService {
         
         // 下午 5 點 — 完成度未達 80%
         let eveningContent = UNMutableNotificationContent()
-        eveningContent.title = "下午提醒"
-        eveningContent.body = "還有任務沒完成，把握最後時間！"
+        eveningContent.title = localized("下午提醒")
+        eveningContent.body = localized("還有任務沒完成，把握最後時間！")
         eveningContent.sound = .default
         
         var eveningComponents = DateComponents()
@@ -58,8 +58,8 @@ class NotificationService {
         
         // 晚上 9 點 — 提醒設定明日任務
         let nightContent = UNMutableNotificationContent()
-        nightContent.title = "準備迎接明天了嗎？"
-        nightContent.body = "花 5 分鐘設定明日六件事，讓明天更順利。"
+        nightContent.title = localized("準備迎接明天了嗎？")
+        nightContent.body = localized("花 5 分鐘設定明日六件事，讓明天更順利。")
         nightContent.sound = .default
         
         var nightComponents = DateComponents()
