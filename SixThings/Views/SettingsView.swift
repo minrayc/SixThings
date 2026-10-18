@@ -19,8 +19,8 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("一般") {
-                Picker("語言", selection: $appLanguage) {
+            Section(localized("一般")) {
+                Picker(localized("語言"), selection: $appLanguage) {
                     Text("中文").tag("zh-Hant")
                     Text("English").tag("en")
                 }
@@ -29,8 +29,8 @@ struct SettingsView: View {
                 }
             }
 
-            Section("通知") {
-                Toggle("每日提醒", isOn: $notificationsEnabled)
+            Section(localized("通知")) {
+                Toggle(localized("每日提醒"), isOn: $notificationsEnabled)
                     .onChange(of: notificationsEnabled) {
                         if notificationsEnabled {
                             NotificationService.shared.scheduleNotifications(todayTasks: viewModel.todayTasks)
@@ -40,9 +40,9 @@ struct SettingsView: View {
                     }
             }
 
-            Section("關於") {
+            Section(localized("關於")) {
                 HStack {
-                    Text("版本")
+                    Text(localized("版本"))
                     Spacer()
                     Text(verbatim: appVersion)
                         .foregroundColor(.secondary)

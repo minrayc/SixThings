@@ -86,17 +86,17 @@ class TaskViewModel: ObservableObject {
         persistTasks()
     }
     
-    func getEncouragement(progress: Int) -> String {
-        guard progress > 0 && progress <= 6 else { return NSLocalizedString("encouragement_0", comment: "") }
+    func getEncouragementKey(progress: Int) -> String {
+        guard progress > 0 && progress <= 6 else { return "encouragement_0" }
         let random = Int.random(in: 1...3)
-        return NSLocalizedString("encouragement_\(progress)_\(random)", comment: "")
+        return "encouragement_\(progress)_\(random)"
     }
-    
+
     func addTutorialTask() {
         // 1. 今天已經有任務就不加（直接 return）
         guard todayTasks.isEmpty else { return }
-        // 2. 建立「完成今日任務設定」，日期今天、未完成
-        let task = Task(title: "完成今日任務設定", isCompleted: false, date: Date())
+        // 2. 建立「完成今日任務設定」，依照 App 語言決定名稱
+        let task = Task(title: localized("完成今日任務設定"), isCompleted: false, date: Date())
         // 3. 加進 tasks 並存檔
         tasks.append(task)
         persistTasks()
