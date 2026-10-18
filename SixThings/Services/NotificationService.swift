@@ -11,6 +11,11 @@ class NotificationService {
     static let shared = NotificationService()
     
     func scheduleNotifications(todayTasks: [Task]) {
+        let enabled = UserDefaults.standard.object(forKey: "notificationsEnabled") as? Bool ?? true
+        guard enabled else {
+            cancelAllNotifications()
+            return
+        }
         cancelAllNotifications()
         
         // 早上 9 點 — 今日任務尚未設定

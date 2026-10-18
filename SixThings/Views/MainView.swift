@@ -15,6 +15,7 @@ struct MainView: View {
     @State var currentEncouragement = ""
     @AppStorage("hasSeenTutorial") var hasSeenTutorial = false
     @State var showTutorial = false
+    @State var showSettings = false
     
     var completedCount:Int {
         viewModel.todayTasks.filter { $0.isCompleted }.count
@@ -34,7 +35,7 @@ struct MainView: View {
                     CircularProgressView(progress: completedCount)
                         .frame(height: 170)
                         .tutorialTarget(.progress)
-                    Text(LocalizedStringKey(currentEncouragement))
+                    Text(currentEncouragement)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
@@ -46,7 +47,7 @@ struct MainView: View {
                             HandwrittenLine()
                         }
                         .onChange(of: completedCount) {
-                            currentEncouragement = viewModel.getEncouragementKey(progress: completedCount)
+                            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
                         }
                     
                 }
@@ -105,7 +106,9 @@ struct MainView: View {
                 isExpanded: $isExpanded,
                 showTodayEdit: $showTodayEdit,
                 showTomorrowEdit: $showTomorrowEdit,
-                isTodayTaskSet: viewModel.isTodayTaskSet()
+                isTodayTaskSet: viewModel.isTodayTaskSet(),
+                showSettings: $showSettings
+                
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         }
@@ -114,6 +117,9 @@ struct MainView: View {
         }
         .navigationDestination(isPresented: $showTomorrowEdit) {
             TomorrowTaskEditView()
+        }
+        .navigationDestination(isPresented: $showSettings) {
+            SettingsView()
         }
         .overlayPreferenceValue(TutorialAnchorKey.self) { anchors in
             if showTutorial {
@@ -129,7 +135,7 @@ struct MainView: View {
         // 從編輯頁返回主畫面時
         .onAppear {
             viewModel.checkAndUpdateDate()
-            currentEncouragement = viewModel.getEncouragementKey(progress: completedCount)
+            currentEncouragement = viewModel.getEncouragement(progress: completedCount)
             if !hasSeenTutorial {
                 viewModel.addTutorialTask()
                 showTutorial = true

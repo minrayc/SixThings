@@ -14,6 +14,7 @@ struct RadialMenuView: View {
     @Binding var showTomorrowEdit: Bool
     let isTodayTaskSet: Bool
     @State private var showTodayNotSetAlert = false
+    @Binding var showSettings: Bool
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -72,6 +73,7 @@ struct RadialMenuView: View {
                 // 設定
                 Button {
                     // action
+                    showSettings = true
                     toggleMenu()
                 } label: {
                     Label("設定", systemImage: "gearshape.fill")
@@ -144,5 +146,6 @@ struct RadialMenuView: View {
     @Previewable @State var isExpanded = false
     @Previewable @State var showToday = false
     @Previewable @State var showTomorrow = false
-    RadialMenuView(isExpanded: $isExpanded, showTodayEdit: $showToday, showTomorrowEdit: $showTomorrow, isTodayTaskSet: false)
+    @Previewable @State var showSettings = false
+    RadialMenuView(isExpanded: $isExpanded, showTodayEdit: $showToday, showTomorrowEdit: $showTomorrow, isTodayTaskSet: false, showSettings: $showSettings)
 }

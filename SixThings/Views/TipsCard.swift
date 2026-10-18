@@ -12,13 +12,13 @@ struct TipsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 用 ForEach 把每條 tips 顯示成「✸ 內容」
-            ForEach(tips.indices, id: \.self) { i in
+            ForEach(tips.indices, id: \.self) { tip in
                 HStack(alignment: .top, spacing: 6) {
-                    Text(verbatim: "✸")
-                    Text(tips[i])
-                }
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                        Text(verbatim: "✸")
+                        Text(tips[tip])
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
         }
         .padding()

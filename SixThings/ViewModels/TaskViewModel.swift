@@ -86,30 +86,20 @@ class TaskViewModel: ObservableObject {
         persistTasks()
     }
     
-    func getEncouragementKey(progress: Int) -> String {
-        guard progress > 0 && progress <= 6 else { return "encouragement_0" }
+    func getEncouragement(progress: Int) -> String {
+        guard progress > 0 && progress <= 6 else { return NSLocalizedString("encouragement_0", comment: "") }
         let random = Int.random(in: 1...3)
-        return "encouragement_\(progress)_\(random)"
+        return NSLocalizedString("encouragement_\(progress)_\(random)", comment: "")
     }
     
     func addTutorialTask() {
         // 1. 今天已經有任務就不加（直接 return）
         guard todayTasks.isEmpty else { return }
         // 2. 建立「完成今日任務設定」，日期今天、未完成
-        let task = Task(title: localized("完成今日任務設定"), isCompleted: false, date: Date())
+        let task = Task(title: "完成今日任務設定", isCompleted: false, date: Date())
         // 3. 加進 tasks 並存檔
         tasks.append(task)
         persistTasks()
-    }
-    
-    // 依照使用者在 App 內選的語言，從翻譯表取出文字
-    func localized(_ key: String) -> String {
-        let language = UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
-        guard let path = Bundle.main.path(forResource: language, ofType: "lproj"),
-              let bundle = Bundle(path: path) else {
-            return key
-        }
-        return bundle.localizedString(forKey: key, value: nil, table: nil)
     }
     
 }
