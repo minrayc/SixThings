@@ -142,8 +142,8 @@ struct TodayTaskEditView: View {
                             TextField("任務名稱", text: $task.title)
                                 .focused($isEditing)
                                 .onChange(of: task.title) {
-                                    if task.title.count > maxTitleLength {
-                                        task.title = String(task.title.prefix(maxTitleLength))
+                                    if task.title.isOverTitleLimit {
+                                        task.title = task.title.truncatedToTitleLimit()
                                     }
                                 }
                         }

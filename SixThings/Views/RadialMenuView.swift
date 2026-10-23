@@ -9,21 +9,22 @@ import SwiftUI
 struct RadialMenuView: View {
     
     @Binding var isExpanded: Bool
-    @State private var itemsVisible: [Bool] = [false, false, false, false]
     @Binding var showTodayEdit: Bool
     @Binding var showTomorrowEdit: Bool
     let isTodayTaskSet: Bool
-    @State private var showTodayNotSetAlert = false
     @Binding var showSettings: Bool
+    
+    // 三個膠囊按鈕的顯示狀態：0 今日任務、1 明日任務、2 設定
+    @State private var itemsVisible: [Bool] = [false, false, false]
+    @State private var showTodayNotSetAlert = false
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             
-            // 四個膠囊按鈕
+            // 三個膠囊按鈕
             VStack(alignment: .trailing, spacing: 20) {
                 // 今日任務
                 Button {
-                    // action
                     showTodayEdit = true
                     toggleMenu()
                 } label: {
@@ -36,10 +37,9 @@ struct RadialMenuView: View {
                 }
                 .opacity(itemsVisible[0] ? 1 : 0)
                 .offset(y: itemsVisible[0] ? 0 : 12)
-                // 明日任務
+                
+                // 明日任務：今天已設定 → 進明日頁；未設定 → 跳彈窗
                 Button {
-                    // 今天已設定 → 進明日頁
-                    // 今天未設定 → 跳彈窗
                     if isTodayTaskSet {
                         showTomorrowEdit = true
                     } else {
@@ -56,23 +56,9 @@ struct RadialMenuView: View {
                 }
                 .opacity(itemsVisible[1] ? 1 : 0)
                 .offset(y: itemsVisible[1] ? 0 : 12)
-                // 年度目標
-                Button {
-                    // action
-                    toggleMenu()
-                } label: {
-                    Label("年度目標", systemImage: "target")
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color(.systemBackground))
-                        .clipShape(Capsule())
-                        .shadow(radius: 3)
-                }
-                .opacity(itemsVisible[2] ? 1 : 0)
-                .offset(y: itemsVisible[2] ? 0 : 12)
+                
                 // 設定
                 Button {
-                    // action
                     showSettings = true
                     toggleMenu()
                 } label: {
@@ -83,8 +69,8 @@ struct RadialMenuView: View {
                         .clipShape(Capsule())
                         .shadow(radius: 3)
                 }
-                .opacity(itemsVisible[3] ? 1 : 0)
-                .offset(y: itemsVisible[3] ? 0 : 12)
+                .opacity(itemsVisible[2] ? 1 : 0)
+                .offset(y: itemsVisible[2] ? 0 : 12)
             }
             .padding(.bottom, 72) // 在主按鈕上方
             
@@ -102,9 +88,10 @@ struct RadialMenuView: View {
             .tutorialTarget(.menu)
         }
         .padding()
+        // 收合統一在這裡處理：不管是按主按鈕，還是外部把 isExpanded 設成 false，都會執行
         .onChange(of: isExpanded) {
             if !isExpanded {
-                for i in 0..<4 {
+                for i in itemsVisible.indices {
                     withAnimation(.spring().delay(Double(i) * 0.08)) {
                         itemsVisible[i] = false
                     }
@@ -119,23 +106,16 @@ struct RadialMenuView: View {
         }
     }
     
-    
     func toggleMenu() {
         let impact = UIImpactFeedbackGenerator(style: .medium)
         impact.impactOccurred()
         isExpanded.toggle()
+        // 展開：由下往上依序出現（設定先出現）
         if isExpanded {
-            // 展開：設定先出現
-            for i in 0..<4{
+            let lastIndex = itemsVisible.count - 1
+            for i in itemsVisible.indices {
                 withAnimation(.spring().delay(Double(i) * 0.08)) {
-                    itemsVisible[3 - i] = true
-                }
-            }
-        } else {
-            // 收合：新增任務先消失
-            for i in 0..<4 {
-                withAnimation(.spring().delay(Double(i) * 0.08)) {
-                    itemsVisible[i] = false
+                    itemsVisible[lastIndex - i] = true
                 }
             }
         }

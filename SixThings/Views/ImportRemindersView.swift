@@ -113,17 +113,18 @@ struct ImportRemindersView: View {
                         // 第二行：超過字數時的提示 / 改名欄位
                         if isLong {
                             if isSelected {
-                                HStack {
+                                VStack(alignment: .leading, spacing: 4) {
                                     TextField("請修改任務名稱", text: $item.title)
                                         .textFieldStyle(.roundedBorder)
-                                    Text("\(item.title.count)/\(maxTitleLength)")
-                                        .font(.caption)
-                                        .monospacedDigit()
-                                        .foregroundColor(isOverLimit(item.title) ? .red : .secondary)
+                                    if isOverLimit(item.title) {
+                                        Text("超過字數上限")
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                    }
                                 }
                                 .padding(.leading, 36)
                             } else {
-                                Text("超過 \(maxTitleLength) 字，勾選後需修改名稱")
+                                Text("超過字數上限，勾選後需修改名稱")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                     .padding(.leading, 36)
@@ -147,8 +148,8 @@ struct ImportRemindersView: View {
         }
     }
 
-    // 字數判斷集中在這裡，之後改 B 方案（加權計算）只要改這一個函式
+    // 字數判斷：使用 B 方案加權計算（定義在 String+Extensions）
     private func isOverLimit(_ title: String) -> Bool {
-        title.count > maxTitleLength
+        title.isOverTitleLimit
     }
 }

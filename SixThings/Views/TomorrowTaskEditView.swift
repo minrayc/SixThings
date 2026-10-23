@@ -9,21 +9,35 @@ import SwiftUI
 struct TomorrowTaskEditView: View {
     @EnvironmentObject var viewModel: TaskViewModel
     @Environment(\.dismiss) var dismiss
+    @Environment(\.openURL) var openURL
     
     @State private var lockedTasks: [Task] = []
     @State private var editableTasks: [Task] = []
     @State private var showTips = false
+    @State private var showDeniedAlert: Bool = false
+    @State private var showFullAlert: Bool = false
+    @State private var importSession: ImportSession?
     @FocusState private var isEditing: Bool
-    // 唯讀：今日 6 個都未完成，沒有空位
+    
     private let tips: [LocalizedStringKey] = [
         "今日未完成任務會優先出現在上方，完成它們才會空出位置",
         "先後順序很重要，你必須訓練對於任務的輕重緩急認知，才能更好地管理時間"
     ]
     
+    // 唯讀：今日 6 個都未完成，沒有空位
     var isReadOnly: Bool {
         editableTasks.isEmpty
     }
     
+    // 剩餘格數：可編輯區中空白的格數
+    var remainingSlots: Int {
+        editableTasks.filter { $0.title.isBlank }.count
+    }
+    
+    // 明天的日期（抓提醒事項、建立空白任務共用）
+    private var tomorrow: Date {
+        Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -35,9 +49,51 @@ struct TomorrowTaskEditView: View {
                 // 最底層：主要內容
                 VStack(spacing: 10) {
                     
-                    // 燈泡按鈕列
+                    // 匯入按鈕、燈泡按鈕列
                     HStack {
                         Spacer()
+                        Button {
+                            if viewModel.remindersService.isAccessDenied() {
+                                showDeniedAlert = true
+                            } else if remainingSlots <= 0 {
+                                showFullAlert = true
+                            } else {
+                                _Concurrency.Task {
+                                    let granted = await viewModel.remindersService.requestRemindersAccess()
+                                    if granted {
+                                        let reminders = await viewModel.remindersService.fetchReminders(dueOn: tomorrow)
+                                        importSession = ImportSession(reminders: reminders)
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "square.and.arrow.down")
+                                .font(.title3)
+                                .foregroundColor(.primary)
+                                .frame(width: 40, height: 40)
+                                .background(
+                                    Circle()
+                                        .fill(Color(.systemBackground))
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.primary, lineWidth: 1.5)
+                                )
+                        }
+                        .alert("需要提醒事項權限", isPresented: $showDeniedAlert) {
+                            Button("取消", role: .cancel) { }
+                            Button("前往設定") {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    openURL(url)
+                                }
+                            }
+                        } message: {
+                            Text("請到「設定」開啟提醒事項權限，即可匯入任務")
+                        }
+                        .alert("任務已滿", isPresented: $showFullAlert) {
+                            Button("我知道了", role: .cancel) { }
+                        }
+                        
                         Button {
                             withAnimation { showTips.toggle() }
                         } label: {
@@ -73,8 +129,8 @@ struct TomorrowTaskEditView: View {
                             TextField("任務名稱", text: $task.title)
                                 .focused($isEditing)
                                 .onChange(of: task.title) {
-                                    if task.title.count > maxTitleLength {
-                                        task.title = String(task.title.prefix(maxTitleLength))
+                                    if task.title.isOverTitleLimit {
+                                        task.title = task.title.truncatedToTitleLimit()
                                     }
                                 }
                         }
@@ -135,7 +191,6 @@ struct TomorrowTaskEditView: View {
             
         }
         .onAppear {
-            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
             // 1. lockedTasks = 今日未完成任務
             lockedTasks = viewModel.getUnfinishedTasks()
             // 2. editableTasks = 已存的明日任務 + 空白補足
@@ -145,9 +200,26 @@ struct TomorrowTaskEditView: View {
                 Task(title: "", isCompleted: false, date: tomorrow)
             } : []
             editableTasks = savedTomorrowTasks + emptyTasks
-            
+        }
+        .sheet(item: $importSession) { session in
+            ImportRemindersView(
+                reminders: session.reminders,
+                remainingSlots: remainingSlots,
+                emptyDescription: "提醒事項中沒有明天到期、未完成的項目"
+            ) { titles in
+                fillBlankSlots(with: titles)
+            }
         }
         .navigationBarBackButtonHidden(true)
+    }
+    
+    // 匯入的標題依序填進空白格：A、空、B、空、空 + [X, Y] → A、X、B、Y、空
+    private func fillBlankSlots(with titles: [String]) {
+        var iterator = titles.makeIterator()
+        for index in editableTasks.indices where editableTasks[index].title.isBlank {
+            guard let title = iterator.next() else { break }
+            editableTasks[index].title = title
+        }
     }
 }
 
@@ -155,4 +227,3 @@ struct TomorrowTaskEditView: View {
     TomorrowTaskEditView()
         .environmentObject(TaskViewModel())
 }
-
