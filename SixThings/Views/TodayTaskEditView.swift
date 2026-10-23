@@ -16,6 +16,8 @@ struct TodayTaskEditView: View {
     @State private var showTips = false
     @State private var showDeniedAlert: Bool = false
     @State private var showFullAlert: Bool = false
+    @State private var importSession: ImportSession?
+    
     @FocusState private var isEditing: Bool   // 是否有輸入框正在輸入
     
     private let tips: [LocalizedStringKey] = [
@@ -35,6 +37,15 @@ struct TodayTaskEditView: View {
     
     var remainingSlots: Int {
         editableTasks.filter { $0.title.isBlank }.count
+    }
+    
+    // 匯入的標題依序填進空白格：A、空、B、空、空 + [X, Y] → A、X、B、Y、空
+    private func fillBlankSlots(with titles: [String]) {
+        var iterator = titles.makeIterator()
+        for index in editableTasks.indices where editableTasks[index].title.isBlank {
+            guard let title = iterator.next() else { break }
+            editableTasks[index].title = title
+        }
     }
     
     var body: some View {
@@ -59,11 +70,8 @@ struct TodayTaskEditView: View {
                                 _Concurrency.Task {
                                     let granted = await viewModel.remindersService.requestRemindersAccess()
                                     if granted {
-                                        print("開啟表單")
                                         let reminders = await viewModel.remindersService.fetchReminders(dueOn: Date())
-                                        for reminder in reminders {
-                                            print(reminder.title)
-                                        }
+                                        importSession = ImportSession(reminders: reminders)
                                     }
                                 }
                             }
@@ -78,7 +86,7 @@ struct TodayTaskEditView: View {
                                 )
                                 .overlay(
                                     Circle()
-                                        .stroke(Color.black, lineWidth: 1.5)
+                                        .stroke(Color.primary, lineWidth: 1.5)
                                 )
                         }
                         .alert("需要提醒事項權限", isPresented: $showDeniedAlert ) {
@@ -208,9 +216,23 @@ struct TodayTaskEditView: View {
                 Task(title: "", isCompleted: false, date: Date())
             } : []
         }
+        .sheet(item: $importSession) { session in
+            ImportRemindersView(
+                reminders: session.reminders,
+                remainingSlots: remainingSlots
+            ) { titles in
+                fillBlankSlots(with: titles)
+            }
+        }
         .navigationBarBackButtonHidden(true)
     }
 }
+
+struct ImportSession: Identifiable {
+    let id = UUID()
+    let reminders: [ReminderItem]
+}
+
 
 #Preview {
     TodayTaskEditView()
