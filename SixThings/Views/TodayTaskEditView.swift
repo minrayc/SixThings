@@ -5,6 +5,7 @@
 //  Created by 張閔瑞 on 2026/10/12.
 //
 import SwiftUI
+import EventKit
 
 struct TodayTaskEditView: View {
     @EnvironmentObject var viewModel: TaskViewModel
@@ -60,7 +61,10 @@ struct TodayTaskEditView: View {
                                     let granted = await viewModel.remindersService.requestRemindersAccess()
                                     if granted {
                                         print("開啟表單")
-                                        
+                                        let reminders = await viewModel.remindersService.fetchReminders(dueOn: Date())
+                                        for reminder in reminders {
+                                            print(reminder.title ?? "")
+                                        }
                                     }
                                 }
                             }
