@@ -7,9 +7,10 @@
 import SwiftUI
 
 struct ImportRemindersView: View {
-    let reminders: [ReminderItem]   // 從編輯頁傳進來的原始清單（唯讀）
-    let remainingSlots: Int         // 編輯頁目前剩幾格空白
-    let onImport: ([String]) -> Void  // 按「確定匯入」時，把勾選的標題交回編輯頁
+    let reminders: [ReminderItem]             // 從編輯頁傳進來的原始清單（唯讀）
+    let remainingSlots: Int                   // 編輯頁目前剩幾格空白
+    let emptyDescription: LocalizedStringKey  // 沒有符合項目時的說明（今日 / 明日頁各自傳入）
+    let onImport: ([String]) -> Void          // 按「確定匯入」時，把勾選的標題交回編輯頁
 
     @Environment(\.dismiss) private var dismiss
 
@@ -47,56 +48,16 @@ struct ImportRemindersView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    ForEach($items) { $item in
-                        let isSelected = selectedIDs.contains(item.id)
-                        // 不能點：還沒勾，而且已經勾滿
-                        let isDisabled = !isSelected && availableCount <= 0
-                        let isLong = overLimitIDs.contains(item.id)
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            // 第一行：勾選圖示 + 原始標題
-                            Button {
-                                toggle(item)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                        .font(.title3)
-                                        .foregroundColor(isSelected ? .blue : .secondary)
-                                    Text(originalTitles[item.id] ?? item.title)
-                                        .foregroundColor(.primary)
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())   // 整列（含空白處）都能點
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(isDisabled)
-
-                            // 第二行：超過字數時的提示 / 改名欄位
-                            if isLong {
-                                if isSelected {
-                                    HStack {
-                                        TextField("請修改任務名稱", text: $item.title)
-                                            .textFieldStyle(.roundedBorder)
-                                        Text("\(item.title.count)/\(maxTitleLength)")
-                                            .font(.caption)
-                                            .monospacedDigit()
-                                            .foregroundColor(isOverLimit(item.title) ? .red : .secondary)
-                                    }
-                                    .padding(.leading, 36)
-                                } else {
-                                    Text("超過 \(maxTitleLength) 字，勾選後需修改名稱")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .padding(.leading, 36)
-                                }
-                            }
-                        }
-                        .opacity(isDisabled ? 0.4 : 1.0)
+            Group {
+                if reminders.isEmpty {
+                    // 空狀態：沒有符合日期的未完成提醒事項
+                    ContentUnavailableView {
+                        Label("沒有可匯入的項目", systemImage: "checklist")
+                    } description: {
+                        Text(emptyDescription)
                     }
-                } header: {
-                    Text("尚可匯入 \(availableCount) 個項目")
+                } else {
+                    reminderList
                 }
             }
             .navigationTitle("匯入提醒事項")
@@ -118,6 +79,62 @@ struct ImportRemindersView: View {
         }
         .onAppear {
             items = reminders
+        }
+    }
+
+    // 提醒事項清單（有符合項目時顯示）
+    private var reminderList: some View {
+        List {
+            Section {
+                ForEach($items) { $item in
+                    let isSelected = selectedIDs.contains(item.id)
+                    // 不能點：還沒勾，而且已經勾滿
+                    let isDisabled = !isSelected && availableCount <= 0
+                    let isLong = overLimitIDs.contains(item.id)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        // 第一行：勾選圖示 + 原始標題
+                        Button {
+                            toggle(item)
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundColor(isSelected ? .blue : .secondary)
+                                Text(originalTitles[item.id] ?? item.title)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())   // 整列（含空白處）都能點
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isDisabled)
+
+                        // 第二行：超過字數時的提示 / 改名欄位
+                        if isLong {
+                            if isSelected {
+                                HStack {
+                                    TextField("請修改任務名稱", text: $item.title)
+                                        .textFieldStyle(.roundedBorder)
+                                    Text("\(item.title.count)/\(maxTitleLength)")
+                                        .font(.caption)
+                                        .monospacedDigit()
+                                        .foregroundColor(isOverLimit(item.title) ? .red : .secondary)
+                                }
+                                .padding(.leading, 36)
+                            } else {
+                                Text("超過 \(maxTitleLength) 字，勾選後需修改名稱")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.leading, 36)
+                            }
+                        }
+                    }
+                    .opacity(isDisabled ? 0.4 : 1.0)
+                }
+            } header: {
+                Text("尚可匯入 \(availableCount) 個項目")
+            }
         }
     }
 

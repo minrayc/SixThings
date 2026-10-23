@@ -219,7 +219,8 @@ struct TodayTaskEditView: View {
         .sheet(item: $importSession) { session in
             ImportRemindersView(
                 reminders: session.reminders,
-                remainingSlots: remainingSlots
+                remainingSlots: remainingSlots,
+                emptyDescription: "提醒事項中沒有今天到期、未完成的項目"
             ) { titles in
                 fillBlankSlots(with: titles)
             }
