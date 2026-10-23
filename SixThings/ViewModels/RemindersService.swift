@@ -23,7 +23,7 @@ class RemindersService {
         return status == .denied || status == .restricted
     }
     
-    func fetchReminders(dueOn date: Date) async -> [EKReminder] {
+    func fetchReminders(dueOn date: Date) async -> [ReminderItem] {
         let calendar = Calendar.current
         let predicate = store.predicateForIncompleteReminders(
             withDueDateStarting: nil, ending: nil, calendars: nil
@@ -37,6 +37,8 @@ class RemindersService {
                 return false
             }
             return calendar.isDate(date, inSameDayAs: dueDate)
+        }.map { reminder in
+            ReminderItem(id: reminder.calendarItemIdentifier, title: reminder.title ?? "")
         }
     }
     
