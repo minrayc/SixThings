@@ -9,10 +9,13 @@ import SwiftUI
 struct TodayTaskEditView: View {
     @EnvironmentObject var viewModel: TaskViewModel
     @Environment(\.dismiss) var dismiss
+    @Environment(\.openURL) var openURL
     
     @State private var lockedTasks: [Task] = []
     @State private var editableTasks: [Task] = []
     @State private var showTips = false
+    @State private var showDeniedAlert: Bool = false
+    @State private var showFullAlert: Bool = false
     @FocusState private var isEditing: Bool   // 是否有輸入框正在輸入
     
     private let tips: [LocalizedStringKey] = [
@@ -48,38 +51,47 @@ struct TodayTaskEditView: View {
                     HStack {
                         Spacer()
                         Button {
-                            if remainingSlots <= 0 {
-                                print("任務已滿")
-                                print(lockedTasks.count)
-                                print(editableTasks.count)
-                            } else if viewModel.remindersService.isAccessDenied(){
-                                print("顯示 Alert")
-                                print(lockedTasks.count)
-                                print(editableTasks.count)
+                            if viewModel.remindersService.isAccessDenied() {
+                                showDeniedAlert = true
+                            } else if remainingSlots <= 0 {
+                                showFullAlert = true
                             } else {
                                 _Concurrency.Task {
                                     let granted = await viewModel.remindersService.requestRemindersAccess()
                                     if granted {
                                         print("開啟表單")
-                                        print(lockedTasks.count)
-                                        print(editableTasks.count)
+                                        
                                     }
                                 }
                             }
                         } label: {
                             Image(systemName: "square.and.arrow.down")
                                 .font(.title3)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                                 .frame(width: 40, height: 40)
                                 .background(
                                     Circle()
-                                        .fill(Color.white)
+                                        .fill(Color(.systemBackground))
                                 )
                                 .overlay(
                                     Circle()
                                         .stroke(Color.black, lineWidth: 1.5)
                                 )
                         }
+                        .alert("需要提醒事項權限", isPresented: $showDeniedAlert ) {
+                            Button("取消", role: .cancel) { }
+                            Button("前往設定") {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    openURL(url)
+                                }
+                            }
+                        } message: {
+                            Text("請到「設定」開啟提醒事項權限，即可匯入任務")
+                        }
+                        .alert("任務已滿", isPresented: $showFullAlert) {
+                            Button("我知道了", role: .cancel) { }
+                        }
+                        
                         Button {
                             withAnimation { showTips.toggle() }
                         } label: {
@@ -99,6 +111,7 @@ struct TodayTaskEditView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 15)
+                    
                     
                     // 標題
                     Text("今日任務")
