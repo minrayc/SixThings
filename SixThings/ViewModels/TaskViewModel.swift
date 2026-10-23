@@ -11,6 +11,7 @@ import Combine
 class TaskViewModel: ObservableObject {
     @Published var tasks: [Task] = []
     @Published var errorMessage: String? = ""
+    let remindersService = RemindersService()
     
     var todayTasks: [Task] {
         tasks.filter { Calendar.current.isDateInToday($0.date) }

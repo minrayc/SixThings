@@ -73,8 +73,8 @@ struct TomorrowTaskEditView: View {
                             TextField("任務名稱", text: $task.title)
                                 .focused($isEditing)
                                 .onChange(of: task.title) {
-                                    if task.title.count > 10 {
-                                        task.title = String(task.title.prefix(10))
+                                    if task.title.count > maxTitleLength {
+                                        task.title = String(task.title.prefix(maxTitleLength))
                                     }
                                 }
                         }

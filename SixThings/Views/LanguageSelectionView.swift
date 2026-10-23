@@ -19,28 +19,28 @@ struct LanguageSelectionView: View {
                 } label: {
                     Text("中文")
                         .font(.title2)
-                            .foregroundColor(.primary)
-                            .frame(width: 200)
-                            .padding(.vertical, 16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.primary, lineWidth: 1.5)
-                            )
-                            .contentShape(RoundedRectangle(cornerRadius: 12))
+                        .foregroundColor(.primary)
+                        .frame(width: 200)
+                        .padding(.vertical, 16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.primary, lineWidth: 1.5)
+                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
                 }
                 Button {
                     appLanguage = "en"
                 } label: {
                     Text("English")
                         .font(.title2)
-                            .foregroundColor(.primary)
-                            .frame(width: 200)
-                            .padding(.vertical, 16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.primary, lineWidth: 1.5)
-                            )
-                            .contentShape(RoundedRectangle(cornerRadius: 12))
+                        .foregroundColor(.primary)
+                        .frame(width: 200)
+                        .padding(.vertical, 16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.primary, lineWidth: 1.5)
+                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
             Spacer()

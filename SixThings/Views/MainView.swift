@@ -153,9 +153,10 @@ struct MainView: View {
 #Preview {
     let vm = TaskViewModel()
     vm.tasks = [
-        Task(title: "完成報告第一章", isCompleted: true, date: Date()),
-        Task(title: "回覆客戶信件", isCompleted: false, date: Date()),
-        Task(title: "整理會議記錄", isCompleted: false, date: Date())
+        Task(title: "完成報告第一章完成報完成報告第一章完成報完成報告第一章完成報完成報告第一章完成報", isCompleted: true, date: Date()),
+        Task(title: "回覆客戶信回覆客戶信回覆客戶信回覆客戶信", isCompleted: false, date: Date()),
+        Task(title: "整理會議記整理會議記整理會議記整理會議記", isCompleted: false, date: Date()),
+        Task(title: "Take a photo and eat noodles and wash dishes ", isCompleted: false, date: Date())
     ]
     return MainView()
         .environmentObject(vm)
