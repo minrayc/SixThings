@@ -36,9 +36,9 @@ final class AdsConsentManager: ObservableObject {
         #if DEBUG
         // 測試歐盟流程時，把下面三行的註解拿掉，模擬「使用者在歐洲」
         // 測完記得改回來；Release 版本不會編譯到這段
-        // let debugSettings = DebugSettings()
-        // debugSettings.geography = .EEA
-        // parameters.debugSettings = debugSettings
+//        let debugSettings = DebugSettings()
+//        debugSettings.geography = .EEA
+//        parameters.debugSettings = debugSettings
         #endif
 
         do {

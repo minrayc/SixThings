@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var viewModel: TaskViewModel
+    @EnvironmentObject var adsConsentManager: AdsConsentManager
     @AppStorage("appLanguage") var appLanguage = ""
     @AppStorage("notificationsEnabled") var notificationsEnabled = true
 
@@ -40,6 +41,27 @@ struct SettingsView: View {
                     }
             }
 
+            Section {
+                // 隱私權政策：Apple 規定 App 內也要能看到
+                Link("隱私權政策", destination: URL(string: "https://minrayc.github.io/privacy.html")!)
+
+                // 只有需要時（歐盟／英國等地區）才顯示
+                if adsConsentManager.isPrivacyOptionsRequired {
+                    Button("隱私權選項") {
+                        _Concurrency.Task {
+                            await adsConsentManager.presentPrivacyOptions()
+                        }
+                    }
+                }
+
+                #if DEBUG
+                // 測試用：清除同意紀錄，重開 App 會再跳一次同意視窗（Release 版不會出現）
+                Button("重設同意（測試用）") {
+                    adsConsentManager.resetConsentForTesting()
+                }
+                #endif
+            }
+            
             Section(localized("關於")) {
                 HStack {
                     Text(localized("版本"))
