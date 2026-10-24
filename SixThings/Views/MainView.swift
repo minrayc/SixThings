@@ -5,10 +5,12 @@
 //  Created by 張閔瑞 on 2026/9/9.
 //
 import SwiftUI
+import UserNotifications
 
 struct MainView: View {
     
     @EnvironmentObject var viewModel: TaskViewModel
+    @EnvironmentObject var adsConsentManager: AdsConsentManager
     @State var isExpanded = false
     @State var showTodayEdit = false
     @State var showTomorrowEdit = false
@@ -20,15 +22,25 @@ struct MainView: View {
     var completedCount:Int {
         viewModel.todayTasks.filter { $0.isCompleted }.count
     }
+    // 依序請求：通知權限 → 廣告同意（GDPR → IDFA 說明 → ATT）
+    // 一個一個來，避免兩個系統視窗同時出現
+    private func requestPermissionsIfNeeded() {
+        _Concurrency.Task {
+            let granted = (try? await UNUserNotificationCenter.current()
+                .requestAuthorization(options: [.alert, .badge, .sound])) ?? false
+            if granted {
+                NotificationService.shared.scheduleNotifications(todayTasks: viewModel.todayTasks)
+            }
+            await adsConsentManager.gatherConsent()
+        }
+    }
     var body: some View {
         
         ZStack {
             
             VStack(spacing: 10) {
                 //廣告
-                Rectangle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(height: 50)
+                AdBannerView()
                 
                 VStack {
                     //CircularProgressView + 鼓勵提示詞
@@ -141,6 +153,16 @@ struct MainView: View {
                 showTutorial = true
                 hasSeenTutorial = true
             }
+            // 不是第一次（沒有在跑教學）→ 直接請求權限
+            if !showTutorial {
+                requestPermissionsIfNeeded()
+            }
+        }
+        // 第一次開 App：教學結束後才請求權限
+        .onChange(of: showTutorial) {
+            if !showTutorial {
+                requestPermissionsIfNeeded()
+            }
         }
         // 午夜換日時系統自動通知
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
@@ -160,4 +182,5 @@ struct MainView: View {
     ]
     return MainView()
         .environmentObject(vm)
+        .environmentObject(AdsConsentManager())
 }

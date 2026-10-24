@@ -23,13 +23,13 @@ final class AdsConsentManager: ObservableObject {
 
     // 避免重複初始化 SDK、重複跑同意流程
     private var isMobileAdsStarted = false
-    private var isGatheringConsent = false
+    private var hasGatheredConsent = false   // 每次啟動 App 只跑一次
 
-    // 啟動時呼叫一次：更新同意狀態 → 需要時顯示表單 → 初始化 SDK
+    // 每次啟動呼叫一次：更新同意狀態 → 需要時顯示表單 → 初始化 SDK
+    // 重複呼叫（例如從編輯頁返回主畫面）會直接略過
     func gatherConsent() async {
-        guard !isGatheringConsent else { return }
-        isGatheringConsent = true
-        defer { isGatheringConsent = false }
+        guard !hasGatheredConsent else { return }
+        hasGatheredConsent = true
 
         let parameters = RequestParameters()
 

@@ -43,7 +43,7 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "你的資料將用來顯示與你更相關的廣告。"
           }
         }

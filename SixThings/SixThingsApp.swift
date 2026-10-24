@@ -6,24 +6,19 @@
 //
 
 import SwiftUI
-import UserNotifications
 
 @main
 struct SixThingsApp: App {
     @StateObject var taskViewModel = TaskViewModel()
+    @StateObject var adsConsentManager = AdsConsentManager()   // 新增
     @Environment(\.scenePhase) var scenePhase
-    
-    init() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            print("通知權限：\(granted)")
-        }
-    }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
         .environmentObject(taskViewModel)
+        .environmentObject(adsConsentManager)   // 新增
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:

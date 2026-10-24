@@ -42,9 +42,7 @@ struct TomorrowTaskEditView: View {
     var body: some View {
         VStack(spacing: 0) {
             // 廣告
-            Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .frame(height: 50)
+            AdBannerView()
             ZStack(alignment: .topTrailing) {
                 // 最底層：主要內容
                 VStack(spacing: 10) {
@@ -183,9 +181,7 @@ struct TomorrowTaskEditView: View {
             }
             // 下方廣告：輸入時隱藏，避免被鍵盤推上來誤觸
             if !isEditing {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(height: 50)
+                AdBannerView()
                     .padding(.top, 8)
             }
             
