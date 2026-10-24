@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		22419999308BACE900F90EDC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22419998308BACE900F90EDC /* PrivacyInfo.xcprivacy */; };
+		228C710A308CDD5300C17938 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 228C7109308CDD5300C17938 /* GoogleMobileAds */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				228C710A308CDD5300C17938 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			);
 			name = SixThings;
 			packageProductDependencies = (
+				228C7109308CDD5300C17938 /* GoogleMobileAds */,
 			);
 			productName = SixThings;
 			productReference = 22AE00AE3037518E00135331 /* SixThings.app */;
@@ -114,6 +117,9 @@
 			);
 			mainGroup = 22AE00A53037518E00135331;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				228C7108308CDD5300C17938 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22AE00AF3037518E00135331 /* Products */;
 			projectDirPath = "";
@@ -283,6 +289,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SixThings/Info.plist;
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Import reminders due today or tomorrow as your tasks.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to show you more relevant ads.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -319,6 +326,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SixThings/Info.plist;
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Import reminders due today or tomorrow as your tasks.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Your data will be used to show you more relevant ads.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -365,6 +373,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		228C7108308CDD5300C17938 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		228C7109308CDD5300C17938 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 228C7108308CDD5300C17938 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 22AE00A63037518E00135331 /* Project object */;
 }
