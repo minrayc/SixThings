@@ -10,9 +10,13 @@ import GoogleMobileAds
 
 // 廣告單元 ID
 enum AdUnitID {
-    // 目前是 Google 的測試 ID。申請開發者帳號、在 AdMob 建立廣告單元後，換成正式 ID
-    // 開發期間一定要用測試 ID，用正式 ID 自己點廣告可能導致帳號被停權
+    #if DEBUG
+    // 開發時用測試廣告，避免自己看到正式廣告、誤點導致帳號被停權
     static let banner = "ca-app-pub-3940256099942544/2435281174"
+    #else
+    // 上架版本用正式廣告
+    static let banner = "ca-app-pub-3462428075271677/5230226979"
+    #endif
 }
 
 struct AdBannerView: View {
